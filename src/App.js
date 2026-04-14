@@ -3,7 +3,9 @@ import "./App.css";
 import { db } from "./firebase";
 import { collection, addDoc } from "firebase/firestore";
 
-const WORDS = ["apple", "grape", "crane", "flame", "brick"];
+import { ANSWERS } from "./wordlists/answers";
+import { ALLOWED } from "./wordlists/allowed";
+
 const COLORS = ["#3a3a3c", "#c9b458", "#6aaa64"];
 
 const KEYBOARD = [
@@ -11,6 +13,8 @@ const KEYBOARD = [
   "ASDFGHJKL",
   "ZXCVBNM"
 ];
+
+// ---------------- GAME LOGIC ----------------
 
 function getTrueFeedback(guess, target) {
   let fb = Array(5).fill(0);
@@ -36,31 +40,26 @@ function getTrueFeedback(guess, target) {
   return fb;
 }
 
-// 🔥 Correct noise model
-function applyNoise(trueFb, noiseLevel) {
+// 🔥 FINAL NOISE MODEL (symmetric)
+function applyNoise(trueFb, noise) {
   return trueFb.map(f => {
     let r = Math.random();
 
-    if (f === 2) {
-      if (r < noiseLevel / 2) return 1;
-      if (r < noiseLevel) return 0;
-      return 2;
-    }
+    if (r < 1 - noise) return f;
 
-    if (f === 1) {
-      if (r < noiseLevel) return 0;
-      return 1;
-    }
-
-    return 0;
+    let others = [0, 1, 2].filter(x => x !== f);
+    return r < 1 - noise + noise / 2 ? others[0] : others[1];
   });
 }
 
+// ---------------- APP ----------------
+
 export default function App() {
 
-  const [target] = useState(WORDS[Math.floor(Math.random()*WORDS.length)]);
+  const [target] = useState(
+    ANSWERS[Math.floor(Math.random() * ANSWERS.length)]
+  );
 
-  // 🔥 Dynamic grid
   const [grid, setGrid] = useState([Array(5).fill("")]);
   const [feedbacks, setFeedbacks] = useState([null]);
 
@@ -71,7 +70,9 @@ export default function App() {
   const [noise, setNoise] = useState(0.2);
   const [startTime] = useState(Date.now());
 
-  // ----------- INPUT -----------
+  const [error, setError] = useState("");
+
+  // -------- INPUT --------
 
   const handleKey = (key) => {
     if (gameOver) return;
@@ -89,18 +90,24 @@ export default function App() {
     if (key === "ENTER") {
       if (col < 5) return;
 
-      const guess = grid[row].join("");
+      const guess = grid[row].join("").toLowerCase();
+
+      if (!ALLOWED.includes(guess)) {
+        setError("Not in word list");
+        return;
+      }
+
+      setError("");
+
       const trueFb = getTrueFeedback(guess, target);
       const noisyFb = applyNoise(trueFb, noise);
 
       const newFeedbacks = [...feedbacks];
       newFeedbacks[row] = noisyFb;
 
-      const newGrid = [...grid, Array(5).fill("")];
-      const newFb = [...newFeedbacks, null];
-
-      setGrid(newGrid);
-      setFeedbacks(newFb);
+      setFeedbacks(newFeedbacks);
+      setGrid([...grid, Array(5).fill("")]);
+      setFeedbacks([...newFeedbacks, null]);
 
       setRow(row + 1);
       setCol(0);
@@ -116,7 +123,7 @@ export default function App() {
     }
   };
 
-  // ----------- KEYBOARD -----------
+  // -------- PHYSICAL KEYBOARD --------
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -131,10 +138,10 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   });
 
-  // ----------- FINAL GUESS -----------
+  // -------- FINAL GUESS --------
 
   const handleFinalGuess = async () => {
-    const guess = grid[row].join("");
+    const guess = grid[row].join("").toLowerCase();
     if (guess.length !== 5) return;
 
     const success = guess === target;
@@ -151,12 +158,12 @@ export default function App() {
     });
   };
 
-  // ----------- UI -----------
+  // -------- UI --------
 
   return (
     <div className="app">
 
-      <h1>Noisy Wordle</h1>
+      <h1 className="title">Noisy Wordle</h1>
 
       <div className="slider">
         Noise: {Math.round(noise * 100)}%
@@ -187,38 +194,45 @@ export default function App() {
         ))}
       </div>
 
+      {error && <div className="error">{error}</div>}
+
       <button className="final-btn" onClick={handleFinalGuess}>
         Final Guess
       </button>
 
-      <div className="keyboard">
-        {KEYBOARD.map((row, i) => (
-          <div key={i}>
-            {row.split("").map(k => (
-              <button key={k} onClick={() => handleKey(k)}>
-                {k}
-              </button>
-            ))}
-            {i === 2 && (
-              <>
-                <button onClick={() => handleKey("DEL")}>DEL</button>
-                <button onClick={() => handleKey("ENTER")}>ENTER</button>
-              </>
-            )}
-          </div>
-        ))}
+      <div className="keyboard-wrapper">
+        <div className="keyboard">
+          {KEYBOARD.map((row, i) => (
+            <div key={i}>
+              {row.split("").map(k => (
+                <button key={k} onClick={() => handleKey(k)}>
+                  {k}
+                </button>
+              ))}
+              {i === 2 && (
+                <>
+                  <button onClick={() => handleKey("DEL")}>DEL</button>
+                  <button onClick={() => handleKey("ENTER")}>ENTER</button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="rules-box">
         <h3>Rules</h3>
-        <p>Noisy Feedback :</p>
-        <p>Green → may become Yellow/Black</p>
-        <p>Yellow → may become Black</p>
-        <p>Click Final Guess when confident.</p>
+        <p>Feedback is noisy. Each color may flip.</p>
+        <p>Noise level controls the probability of feedback flips.</p>
+        <p>Use multiple guesses, then commit.</p>
       </div>
 
       {gameOver && (
-        <h2>{grid[row].join("") === target ? "Correct!" : `Word was ${target}`}</h2>
+        <h2 className="result">
+          {grid[row].join("").toLowerCase() === target
+            ? "Correct"
+            : `Answer: ${target}`}
+        </h2>
       )}
 
     </div>

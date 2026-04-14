@@ -7,7 +7,7 @@ body {
 
 .app {
   text-align: center;
-  padding-top: 20px;
+  padding: 20px;
 }
 
 h1 {
@@ -21,6 +21,8 @@ h1 {
 .slider input {
   width: 200px;
 }
+
+/* GRID */
 
 .grid {
   display: flex;
@@ -45,8 +47,10 @@ h1 {
   text-transform: uppercase;
 }
 
+/* KEYBOARD */
+
 .keyboard {
-  margin-top: 30px;
+  margin-top: 25px;
 }
 
 .keyboard button {
@@ -64,6 +68,8 @@ h1 {
   background: #9a9a9c;
 }
 
+/* FINAL BUTTON */
+
 .final-btn {
   margin-top: 20px;
   padding: 12px 25px;
@@ -77,4 +83,55 @@ h1 {
 
 .final-btn:hover {
   background: #6aaa64;
+}
+
+/* ERROR */
+
+.error {
+  color: #ff4d4d;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* RULES */
+
+.rules-box {
+  margin-top: 30px;
+  padding: 15px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #3a3a3c;
+  border-radius: 8px;
+  background: #1a1a1b;
+  font-size: 14px;
+}
+
+/* RESULT */
+
+.result {
+  margin-top: 20px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #3a3a3c;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.keyboard-wrapper {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.keyboard {
+  border: 1px solid #3a3a3c;
+  padding: 10px;
+  border-radius: 8px;
+  background: #1a1a1b;
 }
