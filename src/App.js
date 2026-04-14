@@ -40,7 +40,7 @@ function getTrueFeedback(guess, target) {
   return fb;
 }
 
-// 🔥 FINAL NOISE MODEL (symmetric)
+// 🔥 symmetric noise
 function applyNoise(trueFb, noise) {
   return trueFb.map(f => {
     let r = Math.random();
@@ -71,6 +71,7 @@ export default function App() {
   const [startTime] = useState(Date.now());
 
   const [error, setError] = useState("");
+  const [keyColors, setKeyColors] = useState({});
 
   // -------- INPUT --------
 
@@ -104,8 +105,21 @@ export default function App() {
 
       const newFeedbacks = [...feedbacks];
       newFeedbacks[row] = noisyFb;
-
       setFeedbacks(newFeedbacks);
+
+      // 🔥 update keyboard colors
+      const newKeyColors = { ...keyColors };
+      for (let i = 0; i < 5; i++) {
+        const letter = guess[i].toUpperCase();
+        const color = noisyFb[i];
+
+        if (!(letter in newKeyColors) || color > newKeyColors[letter]) {
+          newKeyColors[letter] = color;
+        }
+      }
+      setKeyColors(newKeyColors);
+
+      // add new row
       setGrid([...grid, Array(5).fill("")]);
       setFeedbacks([...newFeedbacks, null]);
 
@@ -205,7 +219,16 @@ export default function App() {
           {KEYBOARD.map((row, i) => (
             <div key={i}>
               {row.split("").map(k => (
-                <button key={k} onClick={() => handleKey(k)}>
+                <button
+                  key={k}
+                  onClick={() => handleKey(k)}
+                  style={{
+                    background:
+                      keyColors[k] !== undefined
+                        ? COLORS[keyColors[k]]
+                        : "#818384"
+                  }}
+                >
                   {k}
                 </button>
               ))}
@@ -222,9 +245,8 @@ export default function App() {
 
       <div className="rules-box">
         <h3>Rules</h3>
-        <p>Feedback is noisy. Each color may flip.</p>
-        <p>Noise level controls the probability of feedback flips.</p>
-        <p>Use multiple guesses, then commit.</p>
+        <p>Feedback is noisy: each color may flip.</p>
+        <p>Use multiple guesses before committing.</p>
       </div>
 
       {gameOver && (

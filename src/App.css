@@ -10,9 +10,19 @@ body {
   padding: 20px;
 }
 
-h1 {
+/* TITLE */
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 1px;
   margin-bottom: 10px;
+  border-bottom: 2px solid #3a3a3c;
+  display: inline-block;
+  padding-bottom: 5px;
 }
+
+/* SLIDER */
 
 .slider {
   margin-bottom: 20px;
@@ -49,23 +59,32 @@ h1 {
 
 /* KEYBOARD */
 
-.keyboard {
+.keyboard-wrapper {
   margin-top: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.keyboard {
+  border: 1px solid #3a3a3c;
+  padding: 10px;
+  border-radius: 8px;
+  background: #1a1a1b;
 }
 
 .keyboard button {
   margin: 4px;
   padding: 10px 14px;
-  background: #818384;
   border: none;
   border-radius: 4px;
   color: white;
   cursor: pointer;
+  font-weight: bold;
   transition: 0.1s;
 }
 
 .keyboard button:hover {
-  background: #9a9a9c;
+  opacity: 0.85;
 }
 
 /* FINAL BUTTON */
@@ -111,27 +130,4 @@ h1 {
 
 .result {
   margin-top: 20px;
-}
-
-.title {
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #3a3a3c;
-  display: inline-block;
-  padding-bottom: 5px;
-}
-
-.keyboard-wrapper {
-  margin-top: 25px;
-  display: flex;
-  justify-content: center;
-}
-
-.keyboard {
-  border: 1px solid #3a3a3c;
-  padding: 10px;
-  border-radius: 8px;
-  background: #1a1a1b;
 }
