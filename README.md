@@ -1,70 +1,88 @@
-# Getting Started with Create React App
+# Noisy Wordle
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
+Noisy Wordle is a variant of the classic Wordle game in which feedback is stochastic rather than deterministic. Each guess returns a corrupted version of the true feedback, introducing uncertainty into the inference process. The objective is to identify the hidden word using sequential guesses and make a final decision once sufficiently confident.
 
-## Available Scripts
+This project serves as an experimental platform for studying decision-making under noisy observations, with connections to information theory and sequential testing.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Game Description
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- The target is a 5-letter word sampled from the official Wordle solution set.
+- At each step, the player submits a valid guess.
+- Feedback is provided in three colors:
+  - **Green**: correct letter in correct position  
+  - **Yellow**: correct letter in wrong position  
+  - **Gray**: letter not in the word  
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Noisy Feedback Model
+The observed feedback is a noisy version of the true feedback:
+- With probability \(1 - x\), the feedback is correct  
+- With probability \(x/2\), it is flipped to each of the other two colors  
 
-### `npm test`
+This models imperfect information and uncertainty in observations.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## Gameplay
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Players can make an arbitrary number of guesses.
+- Each guess provides noisy feedback.
+- At any point, the player may submit a **Final Guess**.
+- The game ends when a final guess is made.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Features
 
-### `npm run eject`
+- Interactive Wordle-style interface  
+- Realistic Wordle vocabulary (answers + allowed guesses)  
+- Noisy feedback mechanism  
+- Virtual keyboard with adaptive coloring  
+- Unlimited guesses (sequential decision setting)  
+- Firebase-based logging of gameplay data  
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Data Collection
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+For each game, the following data is recorded:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- Sequence of guesses  
+- Observed feedback (noisy)  
+- Final guess and correctness  
+- Noise level  
+- Time taken  
 
-## Learn More
+This enables analysis of:
+- decision strategies  
+- stopping behavior  
+- performance under noise  
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Setup
 
-### Code Splitting
+1. Install dependencies:
+   ```bash
+   npm install
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+2. Run Locally : 
+    ```bash
+    npm start
 
-### Analyzing the Bundle Size
+3. Build for production : 
+    ```bash
+    npm run build
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+4. Deploy : 
+    ```bash
+    firebase deploy
 
-### Making a Progressive Web App
+## Motivation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+This project explores how individuals make decisions under uncertainty. It connects to:
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Sequential hypothesis testing under noisy frameworks
+Human decision-making under noisy signal
